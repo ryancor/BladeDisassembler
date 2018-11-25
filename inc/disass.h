@@ -6,7 +6,8 @@ int ReturnInstructionNumber(unsigned char* opcode, int value);
 int ReturnRegisterNumber(unsigned char* opcode, int value);
 void printAssemblyCode(const char* instr, const char* reg,
   unsigned char* bytes_read,
-  int i
+  int i,
+  unsigned int start_address
 );
 
 struct instrReg {
