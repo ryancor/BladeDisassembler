@@ -1,21 +1,5 @@
 #include "../inc/disass.h"
-
-// helper functions
-
-// store multiple values
-struct storeSplitStr splitStrStart(const char * strToSplit, const char * delim)
-{
-  struct storeSplitStr storeStr;
-  int i = 0;
-  char *copy = strdup(strToSplit);
-  storeStr.reg1 = strtok(copy, delim);
-  storeStr.reg2 = strtok(NULL, delim);
-
-  return storeStr;
-}
-
-
-// dissass functions
+#include "../inc/helper.h"
 
 // each enum value returns a number from instruction
 int ReturnInstructionNumber(unsigned char* opcode, int value)
@@ -99,13 +83,15 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
   }
 }
 
-void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_read, int i)
+void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_read,
+  int i, unsigned int start_address)
 {
   struct storeSplitStr storedStr;
 
   // Skip anything that returns null
   if(strncmp("EIP", reg, strlen(reg)) != 0)
   {
+    printf("0x00000%x:  ", start_address);
     if(strncmp("MOV", instr, strlen(instr)) == 0)
     {
       if(bytes_read[i] == 0x89)
