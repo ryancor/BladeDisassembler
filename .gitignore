@@ -1,2 +1,2 @@
 blade
-*.o
+src/*.o
