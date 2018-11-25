@@ -6,7 +6,7 @@ DEPS = disass.h
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 main: main.o src/disass.o
-	$(CC) -o main main.o src/disass.o
+	$(CC) -o blade main.o src/disass.o
 
 clean:
 	@rm -f *.o src/*.o
