@@ -1,12 +1,13 @@
-CC=gcc
-CFLAGS=-I.
-DEPS = inc/disass.h
+CC = gcc
+CFLAGS = -I.
+DEPS = inc/disass.h inc/helper.h
+OBJ = src/main.o src/disass.o src/helper.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-main: src/main.o src/disass.o
-	$(CC) -o blade src/main.o src/disass.o
+main: $(OBJ)
+	$(CC) -o blade $(OBJ)
 
 clean:
 	@rm -f src/*.o
