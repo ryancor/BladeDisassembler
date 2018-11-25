@@ -1,4 +1,5 @@
 #include "inc/disass.h"
+#include "inc/helper.h"
 
 void usage(int argc, char* argv);
 
@@ -8,7 +9,6 @@ int main(int argc, char** argv)
 
   FILE *fp;
   unsigned char *bytes_read;
-  unsigned int header;
   long fileLen;
   const char *instr;
   const char *reg;
@@ -37,24 +37,18 @@ int main(int argc, char** argv)
   bytes_read = (unsigned char *)malloc((fileLen + 1) * sizeof(char));
   fread(bytes_read, fileLen, 1, fp); // read entire file
 
-  header = (bytes_read[0] << 24) | (bytes_read[1] << 16)| (bytes_read[2] << 8 )
-          | bytes_read[3];
-
-  if(header == 0x7f454c46)
-  {
-    printf("[+] ELF Magic Header Found: 0x%x\n", header);
-  }
-  printf("========== Blade Disassembler ==========\n");
+  unsigned int start_address = checkFileType(bytes_read);
 
   for(int i = 0; i < fileLen; i++)
   {
     // read past the binary headers
-    if(i > 0x10F)
+    if(i > start_address)
     {
       instr = stringFromInstruction(ReturnInstructionNumber(bytes_read, i));
       reg = stringFromRegisters(ReturnRegisterNumber(bytes_read, i));
 
-      printAssemblyCode(instr, reg, bytes_read, i);
+      start_address++;
+      printAssemblyCode(instr, reg, bytes_read, i, start_address);
     }
   }
 
