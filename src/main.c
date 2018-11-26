@@ -2,12 +2,10 @@
 #include "inc/helper.h"
 #include "inc/gui.h"
 
-bool usage(int argc, char* argv, char* argvv);
-
 int main(int argc, char** argv)
 {
-  bool flag = FALSE;
-  flag = usage(argc, argv[0], argv[2]);
+  bool gui_flag = FALSE;
+  gui_flag = usage(argc, argv[0], argv[2]);
 
   FILE *fp;
   unsigned char *bytes_read;
@@ -54,7 +52,7 @@ int main(int argc, char** argv)
     }
   }
 
-  if(flag == TRUE)
+  if(gui_flag == TRUE)
   {
     show_gui_init(argc, argv);
   }
@@ -62,25 +60,4 @@ int main(int argc, char** argv)
 
   fclose(fp);
   return 0;
-}
-
-bool usage(int argc, char* argv, char* argvv)
-{
-  if(argc < 2)
-  {
-    printf("Usage: %s <binary_file>\n", argv);
-    exit(-1);
-  }
-  if(argc == 3)
-  {
-    if(strncmp(argvv, "-g", 2) == 0)
-    {
-      return TRUE;
-    }
-    else {
-      printf("More Usage: %s <binary_file> -g\n", argv);
-      exit(-1);
-    }
-  }
-  return FALSE;
 }
