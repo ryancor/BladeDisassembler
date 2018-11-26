@@ -1,11 +1,13 @@
 #include "inc/disass.h"
 #include "inc/helper.h"
+#include "inc/gui.h"
 
-void usage(int argc, char* argv);
+bool usage(int argc, char* argv, char* argvv);
 
 int main(int argc, char** argv)
 {
-  usage(argc, argv[0]);
+  bool flag = FALSE;
+  flag = usage(argc, argv[0], argv[2]);
 
   FILE *fp;
   unsigned char *bytes_read;
@@ -52,15 +54,33 @@ int main(int argc, char** argv)
     }
   }
 
+  if(flag == TRUE)
+  {
+    show_gui_init(argc, argv);
+  }
+  remove(filename); // delete blade log file
+
   fclose(fp);
   return 0;
 }
 
-void usage(int argc, char* argv)
+bool usage(int argc, char* argv, char* argvv)
 {
   if(argc < 2)
   {
     printf("Usage: %s <binary_file>\n", argv);
-    exit(0);
+    exit(-1);
   }
+  if(argc == 3)
+  {
+    if(strncmp(argvv, "-g", 2) == 0)
+    {
+      return TRUE;
+    }
+    else {
+      printf("More Usage: %s <binary_file> -g\n", argv);
+      exit(-1);
+    }
+  }
+  return FALSE;
 }
