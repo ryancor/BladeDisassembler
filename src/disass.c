@@ -26,7 +26,8 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = MUL;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0xb0 || opcode[value] == 0x89) {
+  else if(opcode[value] == 0x89 || opcode[value] == 0xb0 ||
+    opcode[value] == 0xb4 || opcode[value] == 0xb8) {
     instreg.instruction = MOV;
     return instreg.instruction;
   }
@@ -72,6 +73,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
   }
   else if(opcode[value] == 0xb0 && opcode[value+1] >= 0x00) {
     instreg.registr = AL;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xb4 && opcode[value+1] >= 0x00) {
+    instreg.registr = AH;
     return instreg.registr;
   }
   else if(opcode[value] == 0x89 && opcode[value+1] == 0xe3) {
