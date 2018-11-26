@@ -1,6 +1,27 @@
 #include "../inc/disass.h"
 #include "../inc/helper.h"
 
+bool usage(int argc, char* argv, char* argve)
+{
+  if(argc < 2)
+  {
+    printf("Usage: %s <binary_file>\n", argv);
+    exit(-1);
+  }
+  if(argc == 3)
+  {
+    if(strncmp(argve, "-g", 2) == 0)
+    {
+      return true;
+    }
+    else {
+      printf("More Usage: %s <binary_file> -g\n", argv);
+      exit(-1);
+    }
+  }
+  return false;
+}
+
 unsigned int checkFileType(unsigned char *bytes_read)
 {
   unsigned int header;
