@@ -24,15 +24,13 @@ void check_file_size(FILE *file1)
 void modeselect(GtkWidget *widget, gpointer view)
 {
   char file_array2[8192];
-  FILE *file2;
+  FILE *file1, *file2;
   char word;
   char file_array1[8192];
   gchar *gbuf;
-  FILE *file1;
+  GtkTextBuffer *buffer_from_view;
 
-  GtkTextBuffer *buffer;
-
-  buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
+  buffer_from_view = gtk_text_view_get_buffer(GTK_TEXT_VIEW(view));
 
   gchar *text = gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
 
@@ -49,7 +47,7 @@ void modeselect(GtkWidget *widget, gpointer view)
 
     fclose(file1);
 
-    gtk_text_buffer_set_text(buffer, gbuf, -1);
+    gtk_text_buffer_set_text(buffer_from_view, gbuf, -1);
   }
 }
 
@@ -110,9 +108,10 @@ void show_gui_init(int argc, char *argv[])
   gtk_container_add(GTK_CONTAINER(window), vbox);
 
   g_signal_connect_swapped(G_OBJECT(window), "destroy",
-                           G_CALLBACK(gtk_main_quit), G_OBJECT(window));
+                            G_CALLBACK(gtk_main_quit), G_OBJECT(window));
 
-  g_signal_connect(G_OBJECT (combo),"changed", G_CALLBACK(modeselect),(gpointer) view);
+  g_signal_connect(G_OBJECT (combo),"changed",
+                            G_CALLBACK(modeselect),(gpointer) view);
 
   gtk_widget_show_all(window);
 
