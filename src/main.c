@@ -42,7 +42,7 @@ int main(int argc, char** argv)
   for(int i = 0; i < fileLen; i++)
   {
     // read past the binary headers
-    if(i > start_address)
+    if(i >= start_address)
     {
       instr = stringFromInstruction(ReturnInstructionNumber(bytes_read, i));
       reg = stringFromRegisters(ReturnRegisterNumber(bytes_read, i));

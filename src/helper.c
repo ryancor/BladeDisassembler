@@ -33,15 +33,15 @@ unsigned int checkFileType(unsigned char *bytes_read)
   if(header == 0x7f454c46)
   {
     printf("[+] ELF Magic Header Found: 0x%x\n", header);
-    code_address += 0x10F;
+    code_address += 0x110;
   }
   else if(header == 0x4d5a9000) {
     printf("[+] PE Magic Header Found: 0x%x\n", header);
-    code_address += 0x10F;
+    code_address += 0x110;
   }
   else if(header == 0xcffaedfe) {
     printf("[+] Mach-O Magic Header Found: 0x%x\n", header);
-    code_address += 0x10F;
+    code_address += 0x110;
   }
   else {
     printf("[!] Could not find a proper header, results may vary\n");
