@@ -99,8 +99,8 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
   if(strncmp("EIP", reg, strlen(reg)) != 0)
   {
     file = fopen(filename, "a");
-    fprintf(file, "0x00000%x:  ", start_address);
-    printf("0x00000%x:  ", start_address);
+    fprintf(file, "0x00000%x:", start_address);
+    printf("0x00000%x:", start_address);
     if(strncmp("MOV", instr, strlen(instr)) == 0)
     {
       if(bytes_read[i] == 0x89)
@@ -109,14 +109,14 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
         if(bytes_read[i+1] == 0xe3)
         {
           storedStr = splitStrStart(reg, " ");
-          printf("%s      %s, %s\n", instr, storedStr.reg1, storedStr.reg2);
-          fprintf(file, "%s      %s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+          printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+          fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
         }
       }
       // just mov'ing a number into a register
       else {
-        printf("%s      %s, 0x%x\n", instr, reg, (int)bytes_read[i+1]);
-        fprintf(file, "%s      %s, 0x%x\n", instr, reg, (int)bytes_read[i+1]);
+        printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+1]);
+        fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+1]);
       }
       i += 1;
     }
@@ -125,35 +125,35 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
       if(bytes_read[i] == 0x93)
       {
         storedStr = splitStrStart(reg, " ");
-        printf("%s     %s, %s\n", instr, storedStr.reg1, storedStr.reg2);
-        fprintf(file, "%s     %s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+        printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+        fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
       }
     }
     else if(strncmp("XOR", instr, strlen(instr)) == 0) {
-      printf("%s      %s, %s\n", instr, reg, reg);
-      fprintf(file, "%s      %s, %s\n", instr, reg, reg);
+      printf("\t%s\t\t%s, %s\n", instr, reg, reg);
+      fprintf(file, "\t%s\t\t%s, %s\n", instr, reg, reg);
     }
     else if(strncmp("SPEC", reg, strlen(reg)) == 0) {
       if(strncmp("PUSH", instr, strlen(reg)) == 0)
       {
-        printf("%s     0x%x%x%x%x\n", instr, (int)bytes_read[i+4], (int)bytes_read[i+3],
+        printf("\t%s\t\t0x%x%x%x%x\n", instr, (int)bytes_read[i+4], (int)bytes_read[i+3],
             (int)bytes_read[i+2], (int)bytes_read[i+1]);
-        fprintf(file, "%s     0x%x%x%x%x\n", instr, (int)bytes_read[i+4],
+        fprintf(file, "\t%s\t\t0x%x%x%x%x\n", instr, (int)bytes_read[i+4],
             (int)bytes_read[i+3], (int)bytes_read[i+2], (int)bytes_read[i+1]);
         // jump further into the loop, i jumps four bytes
         i += 4;
       }
       else if(strncmp("INT", instr, strlen(reg)) == 0) {
         // INT (interrupt) can have numbers ranging from 0x01 to 0x80
-        printf("%s      0x%x\n", instr, (int)bytes_read[i+1]);
-        fprintf(file, "%s      0x%x\n", instr, (int)bytes_read[i+1]);
+        printf("\t%s\t\t0x%x\n", instr, (int)bytes_read[i+1]);
+        fprintf(file, "\t%s\t\t\t0x%x\n", instr, (int)bytes_read[i+1]);
         // jump further into the loop, i jumps four bytes
         i += 1;
       }
     }
     else {
-      printf("%s      %s\n", instr, reg);
-      fprintf(file, "%s      %s\n", instr, reg);
+      printf("\t%s\t\t%s\n", instr, reg);
+      fprintf(file, "\t%s\t\t%s\n", instr, reg);
     }
     fclose(file);
   }
