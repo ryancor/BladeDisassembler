@@ -63,6 +63,11 @@ bool checkEndOfFile(unsigned char *bytes_read, int value)
     printf("=== End of ELF file ===\n");
     endFlag = true;
   }
+  else if((symbol == PE_EOFILE || symbol ==  PE_EOFILE_DLL)
+  && header == PE_HEADER) {
+    printf("=== End of PE file ===\n");
+    endFlag = true;
+  }
   return endFlag;
 }
 
