@@ -1,4 +1,8 @@
 # BladeDisassembler
+## Install
+```
+➜  BladeDisassembler git:(master) make && make clean
+```
 ## Usage
 ```
 ➜  BladeDisassembler git:(master) ./blade examples/file-reader
