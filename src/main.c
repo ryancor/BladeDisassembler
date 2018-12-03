@@ -49,9 +49,15 @@ int main(int argc, char** argv)
 
       start_address++;
       printAssemblyCode(instr, reg, bytes_read, i, start_address);
+
+      // symbol for .text is found, we know program is finished
+      if(checkEndOfFile(bytes_read, i))
+      {
+        goto end_of_loop;
+      }
     }
   }
-
+end_of_loop:
   if(gui_flag == TRUE)
   {
     show_gui_init(argc, argv);
