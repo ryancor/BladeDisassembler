@@ -39,6 +39,7 @@ int main(int argc, char** argv)
 
   unsigned int start_address = checkFileType(bytes_read);
 
+  printf("_start:\n");
   for(int i = 0; i < fileLen; i++)
   {
     // read past the binary headers
@@ -48,6 +49,8 @@ int main(int argc, char** argv)
       reg = stringFromRegisters(ReturnRegisterNumber(bytes_read, i));
 
       start_address++;
+      // check for new function start
+      labelFunctions(bytes_read, i, start_address);
       printAssemblyCode(instr, reg, bytes_read, i, start_address);
 
       // symbol for .text is found, we know program is finished
