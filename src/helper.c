@@ -86,7 +86,9 @@ void labelFunctions(unsigned char *bytes_read, int value, unsigned int startAddr
   {
     printf("data_%d\n", genNum);
   }
-  if(eip == ELF_EOFUNC4 && header == ELF_HEADER)
+  // read backwards (-1) so the function is printed at the end
+  if((bytes_read[value-1] == 0xCD || bytes_read[value-1] == 0xC3
+  || eip == ELF_EOFUNC4) && header == ELF_HEADER)
   {
     printf("Sub_%04x:\n", startAddr);
   }
