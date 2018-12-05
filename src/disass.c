@@ -27,13 +27,22 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = XOR;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0x39) {
+    instreg.instruction = CMP;
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0xf6 || opcode[value] == 0xf7) {
     instreg.instruction = MUL;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0x66 || opcode[value] == 0x89 || opcode[value] == 0xb0 ||
-    opcode[value] == 0xb3 || opcode[value] == 0xb4 || opcode[value] == 0xb8) {
+  else if(opcode[value] == 0x66 || opcode[value] == 0x89 || opcode[value] == 0xb0
+    || opcode[value] == 0xb3 || opcode[value] == 0xb4 || opcode[value] == 0xb8
+    || opcode[value] == 0xb9 || opcode[value] == 0xba || opcode[value] == 0xbb) {
     instreg.instruction = MOV;
+    return instreg.instruction;
+  }
+  else if(opcode[value] == 0x72) {
+    instreg.instruction = JB;
     return instreg.instruction;
   }
   else if(opcode[value] == 0x87 || (opcode[value] >= 0x91 && opcode[value] <= 0x93)) {
@@ -69,7 +78,12 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = ECX;
     return instreg.registr;
   }
-  else if(opcode[value] == 0x91) {
+  else if(opcode[value] == 0x72 && opcode[value+1] == 0x32) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x91 && (opcode[value+1] != 0x04
+  && opcode[value+2] != 0x08)) {
     instreg.registr = EAXECX;
     return instreg.registr;
   }
@@ -89,6 +103,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = ECX;
     return instreg.registr;
   }
+  else if(opcode[value] == 0x39 && opcode[value+1] == 0xd0) {
+    instreg.registr = EAXEDX;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0xf7 && opcode[value+1] == 0xe1) {
     instreg.registr = ECX;
     return instreg.registr;
@@ -103,6 +121,25 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
   }
   else if(opcode[value] == 0xb4 && opcode[value+1] >= 0x00) {
     instreg.registr = AH;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xb8 && opcode[value+1] >= 0x00) {
+    instreg.registr = EAX;
+    return instreg.registr;
+  }
+  // value+1 will be the offset variable
+  else if(opcode[value] == 0xb9 && (opcode[value+2] == 0x91
+  && opcode[value+3] == 0x04 && opcode[value+4] == 0x08)) {
+    instreg.registr = ECXOFFSET;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xba && opcode[value+1] >= 0x00
+  && opcode[value-1] != 0x66) { // mov dx and mov edx dont merge
+    instreg.registr = EDX;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xbb && opcode[value+1] >= 0x00) {
+    instreg.registr = EBX;
     return instreg.registr;
   }
   else if(opcode[value] == 0x66 && opcode[value+1] >= 0xba) {
@@ -135,8 +172,14 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
     file = fopen(filename, "a");
     fprintf(file, "0x00000%x:", start_address);
     printf("0x00000%x:", start_address);
-    if(strncmp("MOV", instr, strlen(instr)) == 0)
+
+    if(strncmp("CMP", instr, strlen(instr)) == 0)
     {
+      storedStr = splitStrStart(reg, " ");
+      printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+      fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+    }
+    else if(strncmp("MOV", instr, strlen(instr)) == 0) {
       if(bytes_read[i] == 0x66)
       {
         printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
@@ -149,6 +192,17 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
           storedStr = splitStrStart(reg, " ");
           printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
           fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+        }
+      }
+      else if(bytes_read[i] == 0xb9) {
+        // i+1 will be the offset variable
+        if(bytes_read[i+2] == 0x91 && bytes_read[i+3] == 0x04
+        && bytes_read[i+4] == 0x08)
+        {
+          storedStr = splitStrStart(reg, " ");
+          printf("\t%s\t\t%s, %s [var]\n", instr, storedStr.reg1, storedStr.reg2);
+          fprintf(file, "\t%s\t\t%s, %s [var]\n", instr, storedStr.reg1, storedStr.reg2);
+          i += 5;
         }
       }
       // just mov'ing a number into a register
@@ -185,6 +239,13 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
             (int)bytes_read[i+3], (int)bytes_read[i+2], (int)bytes_read[i+1]);
         // jump further into the loop, i jumps four bytes
         i += 4;
+      }
+      else if(strncmp("JB", instr, strlen(instr)) == 0) {
+        if(bytes_read[i+1] == 0x32)
+        {
+          printf("\t%s\t\tshort [sub_func]\n", instr);
+          fprintf(file, "\t%s\t\tshort [sub_func]\n", instr);
+        }
       }
       else if(strncmp("INT", instr, strlen(reg)) == 0) {
         // INT (interrupt) can have numbers ranging from 0x01 to 0x80
