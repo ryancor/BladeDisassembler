@@ -1,6 +1,7 @@
 #include "../inc/disass.h"
 #include "../inc/helper.h"
 #include "../inc/gui.h"
+#include "../inc/obfuscate.h"
 
 // each enum value returns a number from instruction
 int ReturnInstructionNumber(unsigned char* opcode, int value)
@@ -169,7 +170,10 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
   // Skip anything that returns null
   if(strncmp("EIP", reg, strlen(reg)) != 0)
   {
+    UNHIDE_STRING(filename);
     file = fopen(filename, "a");
+    HIDE_STRING(filename);
+    
     fprintf(file, "0x00000%x:", start_address);
     printf("0x00000%x:", start_address);
 
