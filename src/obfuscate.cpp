@@ -21,10 +21,6 @@ public:
 
   String GetString(const char *text)
   {
-    for(int i = 0; i < strlen(text); i++)
-    {
-      m_Storage[i] ^= SECRET_CHAR;
-    }
     return m_Storage;
   }
 
@@ -91,7 +87,8 @@ void fileSizeLarge(const char *size)
 void printEncryptedString(const char *text)
 {
   obfuscate_string obStr(text);
-  std::string plaintext = obStr.GetString(text);
+  std::string plaintext = obStr.GetString(text); // retrieves encrypted string
+  UNHIDE_STRING((char*)plaintext.c_str());
   std::cout << plaintext << std::endl;
-  obStr.GetString(text);
+  HIDE_STRING((char*)plaintext.c_str());
 }
