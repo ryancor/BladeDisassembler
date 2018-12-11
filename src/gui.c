@@ -1,12 +1,14 @@
 #include "../inc/gui.h"
+#include "../inc/obfuscate.h"
 
 void check_file_size(FILE *file1)
 {
   int size;
+  char *nSize = (char*)malloc(sizeof(char*)+1);
 
   if(file1 == NULL)
   {
-    printf("File does not exist\n");
+    fileNotExist();
     exit(-1);
   }
 
@@ -16,16 +18,20 @@ void check_file_size(FILE *file1)
 
   if(size >= 8000)
   {
-    printf("File size too big : %d\n", size);
+    snprintf(nSize, sizeof(size),"%d", size);
+    fileSizeLarge(nSize);
     exit(-1);
   }
+  free(nSize);
 }
 
 void modeselect(GtkWidget *widget, gpointer view)
 {
   char file_array2[8192];
   FILE *file1, *file2;
-  char word;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
   char file_array1[8192];
   gchar *gbuf;
   GtkTextBuffer *buffer_from_view;
@@ -36,12 +42,15 @@ void modeselect(GtkWidget *widget, gpointer view)
 
   if(strcmp(text, "OLSR MODE") == 0)
   {
+    UNHIDE_STRING(filename);
     file1 = fopen(filename, "r");
+    HIDE_STRING(filename);
+
     check_file_size(file1);
 
-    while((word = fgetc(file1)) != EOF)
+    while((read = getline(&line, &len, file1)) != -1)
     {
-      strcat(file_array1, &word);
+      strcat(file_array1, line);
     }
     gbuf = g_strdup_printf("%s", (gchar *)file_array1);
 
