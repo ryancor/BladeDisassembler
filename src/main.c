@@ -1,6 +1,7 @@
+#include "inc/gui.h"
 #include "inc/disass.h"
 #include "inc/helper.h"
-#include "inc/gui.h"
+#include "inc/obfuscate.h"
 
 int main(int argc, char** argv)
 {
@@ -16,20 +17,20 @@ int main(int argc, char** argv)
   fp = fopen(argv[1], "r");
   if(fp == NULL)
   {
-      printf("File does not exit\n");
+      fileNotExist();
       exit(0);
   }
 
   if(fseek(fp, 0, SEEK_END) == -1) // jump to end of file
   {
-    printf("Can't read bytes from file\n");
+    fileNotReadable();
     exit(0);
   }
 
   fileLen = ftell(fp);
   if(fileLen <= 0)
   {
-    printf("File is empty\n");
+    fileEmpty();
     exit(0);
   }
 
@@ -39,7 +40,7 @@ int main(int argc, char** argv)
 
   unsigned int start_address = checkFileType(bytes_read);
 
-  printf("_start:\n");
+  printEncryptedString("_start:");
   for(int i = 0; i < fileLen; i++)
   {
     // read past the binary headers
@@ -65,7 +66,10 @@ end_of_loop:
   {
     show_gui_init(argc, argv);
   }
+
+  UNHIDE_STRING(filename);
   remove(filename); // delete blade log file
+  HIDE_STRING(filename);
 
   fclose(fp);
   return 0;
