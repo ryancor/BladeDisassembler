@@ -5,8 +5,9 @@
 
 int main(int argc, char** argv)
 {
-  bool gui_flag = FALSE;
-  gui_flag = usage(argc, argv[0], argv[2]);
+  int option_flag = 0;
+  option_flag = usage(argc, argv[0], argv[2]);
+  option_flag >= 2 ? ({goto end_of_loop;}) : false;
 
   FILE *fp;
   unsigned char *bytes_read;
@@ -62,9 +63,12 @@ int main(int argc, char** argv)
     }
   }
 end_of_loop:
-  if(gui_flag == TRUE)
+  if(option_flag == 1)
   {
     show_gui_init(argc, argv);
+  }
+  else if(option_flag == 2) {
+    show_strings(fp, argv);
   }
 
   UNHIDE_STRING(filename);
