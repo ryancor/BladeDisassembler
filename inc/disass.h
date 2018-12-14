@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+void show_strings(FILE *fp, char *argv[]);
 int ReturnInstructionNumber(unsigned char* opcode, int value);
 int ReturnRegisterNumber(unsigned char* opcode, int value);
 void printAssemblyCode(const char* instr, const char* reg,
