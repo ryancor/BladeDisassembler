@@ -17,7 +17,7 @@
 #define PE_EOFUNC2        0x8B442404
 #define PE_EOFUNC3        0x8D762600
 
-bool usage(int argc, char* argv, char* argve);
+int usage(int argc, char* argv, char* argve);
 unsigned int checkFileType(unsigned char *bytes_read);
 bool checkEndOfFile(unsigned char *bytes_read, int value);
 void labelFunctions(unsigned char *bytes_read, int value, unsigned int startAddr);
