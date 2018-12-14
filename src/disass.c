@@ -266,3 +266,36 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
     fclose(file);
   }
 }
+
+void show_strings(FILE *fp, char *argv[])
+{
+  int ch;
+  size_t i = 0;
+
+  fp = fopen(argv[1], "r");
+  if(fp == NULL)
+  {
+      fileNotExist();
+      exit(0);
+  }
+
+  printf("===== Strings ======\n");
+  while((ch = getc(fp)) != EOF)
+  {
+    if(ch >= 32 && ch <= 127)
+    {
+      printf("%c", ch);
+    }
+    if(ch == '\n' || ch == '\0')
+    {
+       i++;
+       if(i >= 15)
+       {
+         printf("\n");
+         i = 0;
+       }
+    }
+  }
+  printf("\n");
+  fclose(fp);
+}
