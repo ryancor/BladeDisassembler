@@ -1,7 +1,7 @@
 #include "../inc/disass.h"
 #include "../inc/helper.h"
 
-bool usage(int argc, char* argv, char* argve)
+int usage(int argc, char* argv, char* argve)
 {
   if(argc < 2)
   {
@@ -12,14 +12,17 @@ bool usage(int argc, char* argv, char* argve)
   {
     if(strncmp(argve, "-g", 2) == 0)
     {
-      return true;
+      return 1;
+    }
+    else if(strncmp(argve, "-s", 2) == 0) {
+      return 2;
     }
     else {
-      printf("More Usage: %s <binary_file> -g\n", argv);
+      printf("More Usage: %s <binary_file> -g || -s\n", argv);
       exit(-1);
     }
   }
-  return false;
+  return 0;
 }
 
 unsigned int checkFileType(unsigned char *bytes_read)
