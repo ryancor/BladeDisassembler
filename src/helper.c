@@ -17,8 +17,11 @@ int usage(int argc, char* argv, char* argve)
     else if(strncmp(argve, "-s", 2) == 0) {
       return 2;
     }
+    else if(strncmp(argve, "-d", 2) == 0) {
+      return 3;
+    }
     else {
-      printf("More Usage: %s <binary_file> -g || -s\n", argv);
+      printf("More Usage: %s <binary_file> -g || -s || -d\n", argv);
       exit(-1);
     }
   }
