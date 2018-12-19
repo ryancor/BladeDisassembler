@@ -35,15 +35,32 @@ void print_current_registers(uint16_t eax, uint16_t ebx, uint16_t ecx,
   uint16_t edx, uint16_t esi, uint16_t edi, uint16_t ebp, uint16_t esp,
   uint16_t eip)
 {
-  printf("EAX => 0x%x\n", eax);
-  printf("EBX => 0x%x\n", ebx);
-  printf("ECX => 0x%x\n", ecx);
-  printf("EDX => 0x%x\n", edx);
-  printf("ESI => 0x%x\n", esi);
-  printf("EDI => 0x%x\n", edi);
-  printf("EBP => 0x%x\n", ebp);
-  printf("ESP => 0x%x\n", esp);
-  printf("EIP => 0x%x\n", eip);
+  printf("EAX => 0x%08x\n", eax);
+  printf("       AX => 0x%08x\n", eax & 0xFFFF); // get lower most bits, to get
+                                               // higher, we do eax >> 16
+  printf("             AH => 0x%08x\n", ((eax >> 8) & 0xff)); // get higher least bits
+  printf("             AL => 0x%08x\n", eax & 0xFF); // get lower least bits
+  printf("EBX => 0x%08x\n", ebx);
+  printf("       BX => 0x%08x\n", ebx & 0xFFFF);
+  printf("             BH => 0x%08x\n", ((ebx >> 8) & 0xff));
+  printf("             BL => 0x%08x\n", ebx & 0xFF);
+  printf("ECX => 0x%08x\n", ecx);
+  printf("       CX => 0x%08x\n", ecx & 0xFFFF);
+  printf("             CH => 0x%08x\n", ((ecx >> 8) & 0xff));
+  printf("             CL => 0x%08x\n", ecx & 0xFF);
+  printf("EDX => 0x%08x\n", edx);
+  printf("       DX => 0x%08x\n", edx & 0xFFFF);
+  printf("             DH => 0x%08x\n", ((edx >> 8) & 0xff));
+  printf("             DL => 0x%08x\n", edx & 0xFF);
+  printf("ESI => 0x%08x\n", esi);
+  printf("       SI => 0x%08x\n", esi & 0xFFFF); // only 16 bit register for ESI
+  printf("EDI => 0x%08x\n", edi);
+  printf("       DI => 0x%08x\n", edi & 0xFFFF); // only 16 bit register for EDI
+  printf("EBP => 0x%08x\n", ebp);
+  printf("       BP => 0x%08x\n", ebp & 0xFFFF);
+  printf("ESP => 0x%08x\n", esp);
+  printf("       SP => 0x%08x\n", esp & 0xFFFF);
+  printf("EIP => 0x%08x\n", eip);
 }
 
 void run_debugger()
