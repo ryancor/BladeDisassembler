@@ -2,8 +2,8 @@ CC = gcc
 CXX = g++
 CFLAGS = -I. -O0 -O2
 CXXFLAGS = -std=c++14 -O0 -O2 -Wno-gnu-string-literal-operator-template
-DEPS = inc/disass.h inc/helper.h inc/gui.h inc/obfuscate.h
-OBJ = src/main src/disass src/helper src/gui src/obfuscate
+DEPS = inc/disass.h inc/helper.h inc/gui.h inc/obfuscate.h inc/emu.h
+OBJ = src/main src/disass src/helper src/gui src/obfuscate src/emu
 OBJS = $(addsuffix .o,$(OBJ))
 
 all:
@@ -18,7 +18,7 @@ blade: $(OBJS)
 
 # compile rest of the C files
 %.o: %.c $(DEPS)
-	$(CC) `pkg-config --cflags gtk+-2.0` -c -o $@ $< $(CFLAGS) 
+	$(CC) `pkg-config --cflags gtk+-2.0` -c -o $@ $< $(CFLAGS)
 
 # compile the cpp file on its own
 obfuscate.o: obfuscate.cpp
