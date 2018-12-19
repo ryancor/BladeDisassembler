@@ -1,4 +1,5 @@
 #include "inc/gui.h"
+#include "inc/emu.h"
 #include "inc/disass.h"
 #include "inc/helper.h"
 #include "inc/obfuscate.h"
@@ -69,6 +70,9 @@ end_of_loop:
   }
   else if(option_flag == 2) {
     show_strings(fp, argv);
+  }
+  else if(option_flag == 3) {
+    run_debugger();
   }
 
   UNHIDE_STRING(filename);
