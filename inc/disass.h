@@ -52,7 +52,8 @@ static inline const char *stringFromInstruction(enum instructions i)
 
 enum registers {
   EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP, EIP, AX, BX, CX, DX, SI, DI, BP, SP,
-  AH, AL, BH, BL, CH, CL, DH, DL, SPEC, EAXEBX, EAXECX, EAXEDX, ECXOFFSET, EBXESP
+  AH, AL, BH, BL, CH, CL, DH, DL, SPEC, EAXEBX, EAXECX, EAXEDX, ECXOFFSET, EBXESP,
+  COND, COUNT
 };
 
 static inline const char *stringFromRegisters(enum registers r)
@@ -60,8 +61,25 @@ static inline const char *stringFromRegisters(enum registers r)
   static const char *reg[] = {
     "EAX", "EBX", "ECX", "EDX", "ESI", "EDI", "EBP", "ESP", "EIP", "AX", "BX", "CX",
     "DX", "SI", "DI", "BP", "SP", "AH", "AL", "BH", "BL", "CH", "CL", "DH", "DL",
-    "SPEC", "EAX EBX", "EAX ECX", "EAX EDX", "ECX OFFSET", "EBX ESP"
+    "SPEC", "EAX EBX", "EAX ECX", "EAX EDX", "ECX OFFSET", "EBX ESP", "COND",
+    "COUNT"
   };
 
   return reg[r];
 }
+
+// EFLAGS
+enum
+{
+  EFL_POS = 1 << 0,
+  EFL_ZRO = 1 << 1,
+  EFL_NEG = 1 << 2,
+};
+
+// Trap Codes
+// https://wiki.osdev.org/Exceptions
+enum
+{
+  TRAP_DIVIDE_ZRO = 0x0,
+  TRAP_DEBUG = 0x1,
+};
