@@ -72,7 +72,7 @@ end_of_loop:
     show_strings(fp, argv);
   }
   else if(option_flag == 3) {
-    run_debugger();
+    run_debugger(argv[1]);
   }
 
   UNHIDE_STRING(filename);
