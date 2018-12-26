@@ -174,6 +174,7 @@ void debugger_loop()
         if((al & 0x0F) > 9 || EFL_POS)
         {
           reg[al] = reg[al] + 6;
+          reg[eax] = reg[al];
         }
         update_eflags(eax);
         print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
@@ -194,6 +195,8 @@ void debugger_loop()
           reg[al] = reg[al] + (10 * reg[ah]);
           reg[ah] &= ~reg[ah];
           reg[ax] = reg[ah] | reg[al];
+
+          reg[eax] = reg[ax];
         }
         update_eflags(eax);
         print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
@@ -253,12 +256,12 @@ void debugger_loop()
       case 0x15:
       {
         uint16_t eax = (instr >> 9) & 0x07;
-        uint16_t imm_flag = (instr >> 16) & 0x01;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
 
         if(imm_flag)
         {
-          uint16_t imm16 = sign_extend(instr & 0x1F, 16);
-          reg[eax] = reg[eax] + imm16 + EFL_ZRO;
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[eax] + imm8 + EFL_ZRO;
         }
         update_eflags(eax);
         print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
@@ -275,12 +278,12 @@ void debugger_loop()
       {
         uint16_t eax = (instr >> 9) & 0x07;
         uint16_t ebx = (instr >> 6) & 0x07;
-        uint16_t imm_flag = (instr >> 5) & 0x01;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
 
         if(imm_flag)
         {
-          uint16_t imm5 = sign_extend(instr & 0x1F, 5);
-          reg[eax] = reg[ebx] + imm5;
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[ebx] + imm8;
         }
         else {
           uint16_t ecx = instr & 0x07;
@@ -302,12 +305,12 @@ void debugger_loop()
       {
         uint16_t eax = (instr >> 9) & 0x07;
         uint16_t ebx = (instr >> 6) & 0x07;
-        uint16_t imm_flag = (instr >> 5) & 0x01;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
 
         if(imm_flag)
         {
-          uint16_t imm5 = sign_extend(instr & 0x1F, 5);
-          reg[eax] = reg[ebx] & imm5;
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[ebx] & imm8;
         }
         else {
           uint16_t ecx = instr & 0x07;
@@ -322,7 +325,12 @@ void debugger_loop()
       case 0x9A:
       {
         // OPERAND = CALL
-        // do nothing
+        reg[ESP] = reg[EIP];
+        reg[ESP]++;
+        reg[EIP] = op & 0x0FFF;
+
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
     }
