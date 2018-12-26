@@ -11,4 +11,4 @@
 #include <sys/termios.h>
 #include <sys/mman.h>
 
-void run_debugger();
+void run_debugger(const char *image_path);
