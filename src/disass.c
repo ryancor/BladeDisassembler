@@ -46,6 +46,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JB;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0x83) {
+    instreg.instruction = SUB;
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0x87 || (opcode[value] >= 0x91 && opcode[value] <= 0x93)) {
     instreg.instruction = XCHG;
     return instreg.instruction;
@@ -100,12 +104,20 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = SPEC;
     return instreg.registr;
   }
+  else if(opcode[value] == 0x31 && opcode[value+1] == 0xc0) {
+    instreg.registr = EAX;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0x31 && opcode[value+1] == 0xc9) {
     instreg.registr = ECX;
     return instreg.registr;
   }
   else if(opcode[value] == 0x39 && opcode[value+1] == 0xd0) {
     instreg.registr = EAXEDX;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x83 && opcode[value+1] == 0xec) {
+    instreg.registr = ESP;
     return instreg.registr;
   }
   else if(opcode[value] == 0xf7 && opcode[value+1] == 0xe1) {
@@ -173,7 +185,7 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
     UNHIDE_STRING(filename);
     file = fopen(filename, "a");
     HIDE_STRING(filename);
-    
+
     fprintf(file, "0x00000%x:", start_address);
     printf("0x00000%x:", start_address);
 
@@ -258,6 +270,11 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
         // jump further into the loop, i jumps four bytes
         i += 1;
       }
+    }
+    else if(strncmp("SUB", instr, strlen(instr)) == 0) {
+      // bytes_read[i + 1] will be the register value
+      printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+      fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
     }
     else {
       printf("\t%s\t\t%s\n", instr, reg);
