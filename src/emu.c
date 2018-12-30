@@ -163,6 +163,7 @@ void debugger_loop()
     uint16_t instr = mem_read(reg[EIP]++);
     uint16_t op = instr >> 12;
 
+    //printf("\n**** OP: %02x\n", op);
     switch(op)
     {
       // OPERAND = AAA
@@ -277,8 +278,8 @@ void debugger_loop()
       case 0x05:
       {
         uint16_t eax = (instr >> 9) & 0x07;
-        uint16_t ebx = (instr >> 6) & 0x07;
-        uint16_t imm_flag = (instr >> 8) & 0x01;
+        uint16_t ebx = (instr >> 8) & 0x07;
+        uint16_t imm_flag = (instr >> 7) & 0x01;
 
         if(imm_flag)
         {
@@ -304,8 +305,8 @@ void debugger_loop()
       case 0x25:
       {
         uint16_t eax = (instr >> 9) & 0x07;
-        uint16_t ebx = (instr >> 6) & 0x07;
-        uint16_t imm_flag = (instr >> 8) & 0x01;
+        uint16_t ebx = (instr >> 8) & 0x07;
+        uint16_t imm_flag = (instr >> 7) & 0x01;
 
         if(imm_flag)
         {
@@ -322,12 +323,59 @@ void debugger_loop()
       }
       break;
 
+      // OPERAND = CALL
       case 0x9A:
       {
-        // OPERAND = CALL
         reg[ESP] = reg[EIP];
         reg[ESP]++;
         reg[EIP] = op & 0x0FFF;
+
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = DIV
+      case 0xF6:
+      case 0xF7:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t edx = (instr >> 6) & 0x07;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
+
+        if(imm_flag)
+        {
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[eax] / imm8;
+          if(reg[eax] < 0xFFF)
+          {
+            reg[eax] = eax;
+            reg[edx] = reg[eax] % imm8;
+          }
+        }
+        else {
+          reg[eax] = reg[eax] / reg[edx];
+        }
+        update_eflags(eax);
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = POP
+      case 0x07:
+      {
+        reg[ESP] = reg[ESP] + 4;
+
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = PUSH
+      case 0x06:
+      {
+        reg[ESP] = reg[ESP] - 4;
 
         print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
         reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
