@@ -52,8 +52,8 @@ static inline const char *stringFromInstruction(enum instructions i)
 
 enum registers {
   EAX, EBX, ECX, EDX, ESI, EDI, EBP, ESP, EIP, AX, BX, CX, DX, SI, DI, BP, SP,
-  AH, AL, BH, BL, CH, CL, DH, DL, SPEC, EAXEBX, EAXECX, EAXEDX, ECXOFFSET, EBXESP,
-  COND, COUNT
+  AH, AL, BH, BL, CH, CL, DH, DL, SPEC, EAXEBX, EAXECX, EAXEDX, ECXOFFSET, EAXESP,
+  EBXESP, COND, COUNT
 };
 
 static inline const char *stringFromRegisters(enum registers r)
@@ -61,8 +61,8 @@ static inline const char *stringFromRegisters(enum registers r)
   static const char *reg[] = {
     "EAX", "EBX", "ECX", "EDX", "ESI", "EDI", "EBP", "ESP", "EIP", "AX", "BX", "CX",
     "DX", "SI", "DI", "BP", "SP", "AH", "AL", "BH", "BL", "CH", "CL", "DH", "DL",
-    "SPEC", "EAX EBX", "EAX ECX", "EAX EDX", "ECX OFFSET", "EBX ESP", "COND",
-    "COUNT"
+    "SPEC", "EAX EBX", "EAX ECX", "EAX EDX", "ECX OFFSET", "EAX ESP", "EBX ESP",
+    "COND", "COUNT"
   };
 
   return reg[r];
