@@ -362,6 +362,21 @@ void debugger_loop()
       }
       break;
 
+      // OPERAND = LEA
+      case 0x8D:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        // mov esp+value into eax
+        uint16_t eip_offset = sign_extend((instr) & 0x1ff, 9);
+
+        reg[eax] = reg[EIP] + eip_offset;
+
+        update_eflags(eax);
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
       // OPERAND = POP
       case 0x07:
       {
