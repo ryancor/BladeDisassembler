@@ -54,6 +54,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = XCHG;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0x8D) {
+    instreg.instruction = LEA;
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0xc1) {
     instreg.instruction = SHR;
     return instreg.instruction;
@@ -118,6 +122,11 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
   }
   else if(opcode[value] == 0x83 && opcode[value+1] == 0xec) {
     instreg.registr = ESP;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x8D && opcode[value+1] == 0x44
+  && opcode[value+2] == 0x24) {
+    instreg.registr = EAXESP;
     return instreg.registr;
   }
   else if(opcode[value] == 0xf7 && opcode[value+1] == 0xe1) {
@@ -194,6 +203,13 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
       storedStr = splitStrStart(reg, " ");
       printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
       fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
+    }
+    else if(strncmp("LEA", instr, strlen(instr)) == 0) {
+      storedStr = splitStrStart(reg, " ");
+      printf("\t%s\t\t%s, [%s+0x%x]\n", instr, storedStr.reg1, storedStr.reg2,
+        bytes_read[i+3]);
+      fprintf(file, "\t%s\t\t%s, [%s+0x%x]\n", instr, storedStr.reg1, storedStr.reg2,
+        bytes_read[i+3]);
     }
     else if(strncmp("MOV", instr, strlen(instr)) == 0) {
       if(bytes_read[i] == 0x66)
