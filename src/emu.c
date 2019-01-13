@@ -362,6 +362,22 @@ void debugger_loop()
       }
       break;
 
+      // OPERAND = JMP
+      case 0xE9:
+      case 0xEA:
+      case 0xEB:
+      {
+        // EIP is instruction following JMP instruction
+        uint16_t eip_offset = sign_extend((instr) & 0x1ff, 9);
+
+        reg[eip_offset] = reg[EIP] + (op & 0x0FFF);
+        reg[EIP] = reg[eip_offset];
+
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
       // OPERAND = LEA
       case 0x8D:
       {
@@ -371,6 +387,56 @@ void debugger_loop()
 
         reg[eax] = reg[EIP] + eip_offset;
 
+        update_eflags(eax);
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = MOV
+      case 0x88:
+      case 0x89:
+      case 0x8A:
+      case 0x8B:
+      case 0x8C:
+      case 0x8E:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t imm_flag = (instr >> 8) & 0x01;;
+
+        if(imm_flag)
+        {
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          if(reg[eax] < 0xFFF)
+          {
+            reg[eax] = reg[imm8];
+            reg[EIP] += 2;
+          }
+        }
+
+        update_eflags(eax);
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = MUL/IMUL
+      case 0x69:
+      case 0x6B:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
+
+        if(imm_flag)
+        {
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[eax] * imm8;
+          if(reg[eax] < 0xFFF)
+          {
+            reg[eax] = eax;
+            reg[eax] = reg[eax] * imm8;
+          }
+        }
         update_eflags(eax);
         print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
         reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
