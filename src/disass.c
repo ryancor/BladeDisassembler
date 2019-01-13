@@ -62,6 +62,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = SHR;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0xE9 || (opcode[value] == 0xEA && opcode[value] == 0xEB)) {
+    instreg.instruction = JMP;
+    return instreg.instruction;
+  }
   else {
     // opcode 90
     instreg.instruction = NOP;
@@ -176,6 +180,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EAX;
     return instreg.registr;
   }
+  else if(opcode[value] == 0xe9 || opcode[value] == 0xea || opcode[value] == 0xeb) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
   else {
     instreg.registr = EIP;
     return instreg.registr;
@@ -278,6 +286,15 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
           printf("\t%s\t\tshort [sub_func]\n", instr);
           fprintf(file, "\t%s\t\tshort [sub_func]\n", instr);
         }
+        i += bytes_read[i+1];
+      }
+      else if(strncmp("JMP", instr, strlen(instr)) == 0) {
+        if(bytes_read[i+1] >= 0x01)
+        {
+          printf("\t%s\t\t0x%x%x\n", instr, bytes_read[i+1], bytes_read[i+2]);
+          fprintf(file, "\t%s\t\t0x%x%x\n", instr, bytes_read[i+1], bytes_read[i+2]);
+        }
+        i += bytes_read[i+1];
       }
       else if(strncmp("INT", instr, strlen(reg)) == 0) {
         // INT (interrupt) can have numbers ranging from 0x01 to 0x80
@@ -285,6 +302,10 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
         fprintf(file, "\t%s\t\t\t0x%x\n", instr, (int)bytes_read[i+1]);
         // jump further into the loop, i jumps four bytes
         i += 1;
+      }
+      else {
+        printf("\t%s\n", instr);
+        fprintf(file, "\t%s\n", instr);
       }
     }
     else if(strncmp("SUB", instr, strlen(instr)) == 0) {
@@ -294,7 +315,7 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
     }
     else {
       printf("\t%s\t\t%s\n", instr, reg);
-      fprintf(file, "\t%s\t\t%s\n", instr, reg);
+      fprintf(file, "\t%s\t\t\t%s\n", instr, reg);
     }
     fclose(file);
   }
