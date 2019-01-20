@@ -340,7 +340,7 @@ void show_strings(FILE *fp, char *argv[])
       exit(0);
   }
 
-  printf("===== Strings ======\n");
+  stringBanner();
   while((ch = getc(fp)) != EOF)
   {
     if(ch >= 32 && ch <= 127)
