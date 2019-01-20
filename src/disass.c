@@ -58,8 +58,14 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = LEA;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0xc1) {
-    instreg.instruction = SHR;
+  else if(opcode[value] == 0xc0 || opcode[value] == 0xc1) {
+    if(opcode[value+1] >= 0xe0 && opcode[value+1] <= 0xe5)
+    {
+      instreg.instruction = SHL;
+    }
+    else {
+      instreg.instruction = SHR;
+    }
     return instreg.instruction;
   }
   else if(opcode[value] == 0xE9 || (opcode[value] == 0xEA && opcode[value] == 0xEB)) {
@@ -265,7 +271,8 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
       printf("\t%s\t\t%s, %s\n", instr, reg, reg);
       fprintf(file, "\t%s\t\t%s, %s\n", instr, reg, reg);
     }
-    else if(strncmp("SHR", instr, strlen(instr)) == 0) {
+    // if SH, then we know its going to be either SHL or SHR
+    else if(strncmp("S", &instr[0], 1) == 0 && strncmp("H", &instr[1], 1) == 0) {
       // bytes_read[i + 1] will be the register value
       printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
       fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
