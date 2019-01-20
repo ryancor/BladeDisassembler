@@ -21,6 +21,7 @@ void fileNotExist();
 void fileEmpty();
 void fileNotReadable();
 void fileSizeLarge(const char *size);
+void stringBanner();
 void printEncryptedString(const char *text);
 
 #ifdef __cplusplus
