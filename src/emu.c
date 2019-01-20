@@ -462,6 +462,50 @@ void debugger_loop()
         reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
+
+      // OPERAND = SHL/SHR
+      case 0xc0:
+      case 0xc1:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t ebx = (instr >> 8) & 0x07;
+        uint16_t imm_flag = (instr >> 7) & 0x01;
+
+        uint16_t count = 31; // 32 bit
+        uint16_t countMASK = 0x1F;
+        uint16_t tempCount = countMASK & count;
+
+        do
+        {
+          if(imm_flag)
+          {
+            uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+            if(imm8 >= 0xe0 && imm8 <= 0xe5) // if instruction is SHL
+            {
+              reg[eax] = reg[ebx] << imm8;
+            }
+            else {
+              reg[eax] = reg[ebx] >> imm8;
+            }
+          }
+          else {
+            uint16_t ecx = instr & 0x07;
+            if(ecx >= 0xe0 && ecx <= 0xe5) // if instruction is SHL
+            {
+              reg[eax] = reg[ebx] << reg[ecx];
+            }
+            else {
+              reg[eax] = reg[ebx] >> reg[ecx];
+            }
+          }
+          tempCount--;
+        } while(tempCount != 0);
+
+        update_eflags(eax);
+        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
+        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
     }
   }
 }
