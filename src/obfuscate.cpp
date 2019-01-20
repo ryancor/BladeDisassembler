@@ -56,6 +56,7 @@ constexpr obfuscated_string<ctype, sizeof... (STR)> operator ""_hidden()
   return { { (STR ^ SECRET<ctype>)... } };
 }
 
+// Using templates
 void fileNotExist()
 {
   static const auto message = "File does not exist"_hidden;
@@ -84,6 +85,14 @@ void fileSizeLarge(const char *size)
   std::cout << plaintext + size << std::endl;
 }
 
+void stringBanner()
+{
+  static const auto message = "===== Strings ======"_hidden;
+  std::string plaintext = message;
+  std::cout << plaintext << std::endl;
+}
+
+// Using non-template
 void printEncryptedString(const char *text)
 {
   obfuscate_string obStr(text);
