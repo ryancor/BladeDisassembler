@@ -117,11 +117,13 @@ void handle_interrupt(int signal)
   exit(signal);
 }
 
-void print_current_registers(uint16_t eax, uint16_t ebx, uint16_t ecx,
-  uint16_t edx, uint16_t esi, uint16_t edi, uint16_t ebp, uint16_t esp,
-  uint16_t eip)
+void print_current_registers(char *instr_name, uint16_t eax, uint16_t ebx,
+  uint16_t ecx, uint16_t edx, uint16_t esi, uint16_t edi, uint16_t ebp,
+  uint16_t esp, uint16_t eip)
 {
   system("clear");
+
+  printf("%s\n", instr_name);
 
   printf("EAX => 0x%08x\t\t\t", eax);
   printf("       AX => 0x%08x\t", eax & 0xFFFF); // get lower most bits, to get
@@ -178,8 +180,8 @@ void debugger_loop()
           reg[eax] = reg[al];
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("AAA", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -200,8 +202,8 @@ void debugger_loop()
           reg[eax] = reg[ax];
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("AAD", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -220,8 +222,8 @@ void debugger_loop()
           reg[al] = reg[al] % imm8;
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("AAM", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -243,8 +245,8 @@ void debugger_loop()
           reg[al] = reg[al] & 0x0F;
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("AAS", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -265,8 +267,8 @@ void debugger_loop()
           reg[eax] = reg[eax] + imm8 + EFL_ZRO;
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("ADC", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -291,8 +293,8 @@ void debugger_loop()
           reg[eax] = reg[ebx] + reg[ecx];
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("ADD", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -318,8 +320,8 @@ void debugger_loop()
           reg[eax] = reg[ebx] & reg[ecx];
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("AND", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -330,8 +332,8 @@ void debugger_loop()
         reg[ESP]++;
         reg[EIP] = op & 0x0FFF;
 
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("CALL", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -357,8 +359,8 @@ void debugger_loop()
           reg[eax] = reg[eax] / reg[edx];
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("DIV", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -373,8 +375,56 @@ void debugger_loop()
         reg[eip_offset] = reg[EIP] + (op & 0x0FFF);
         reg[EIP] = reg[eip_offset];
 
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("JMP", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = JNZ
+      case 0x75:
+      {
+        // EIP is instruction following JNZ instruction
+        uint16_t eip_offset = sign_extend((instr) & 0x1ff, 9);
+        uint16_t zero_flag = (instr >> 9) & 0x07;
+
+        // if ZF flag is 0
+        if(zero_flag & reg[COND])
+        {
+          if(reg[(op & 0x0F00)] >> 8 != (op & 0x0F00))
+          {
+            reg[EIP] += eip_offset + 4;
+          }
+          else {
+            reg[EIP] += eip_offset;
+          }
+        }
+
+        print_current_registers("JNZ", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = JZ
+      case 0x74:
+      {
+        // EIP is instruction following JZ instruction
+        uint16_t eip_offset = sign_extend((instr) & 0x1ff, 9);
+        uint16_t zero_flag = (instr >> 9) & 0x07;
+
+        // if ZF flag is 1
+        if(zero_flag & reg[COND])
+        {
+          if(reg[(op & 0x0F00)] >> 8 == (op & 0x0F00))
+          {
+            reg[EIP] += eip_offset + 4;
+          }
+          else {
+            reg[EIP] += eip_offset;
+          }
+        }
+
+        print_current_registers("JZ", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -388,8 +438,8 @@ void debugger_loop()
         reg[eax] = reg[EIP] + eip_offset;
 
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("LEA", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -415,8 +465,8 @@ void debugger_loop()
         }
 
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("MOV", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -438,8 +488,8 @@ void debugger_loop()
           }
         }
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("MUL/IMUL", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -448,8 +498,8 @@ void debugger_loop()
       {
         reg[ESP] = reg[ESP] + 4;
 
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("POP", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -458,8 +508,8 @@ void debugger_loop()
       {
         reg[ESP] = reg[ESP] - 4;
 
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("PUSH", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
 
@@ -502,8 +552,8 @@ void debugger_loop()
         } while(tempCount != 0);
 
         update_eflags(eax);
-        print_current_registers(reg[EAX], reg[EBX], reg[ECX], reg[EDX], reg[ESI],
-        reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+        print_current_registers("SHL/SHR", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
     }
