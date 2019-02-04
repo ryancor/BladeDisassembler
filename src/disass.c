@@ -8,7 +8,8 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
 {
   struct instrReg instreg;
 
-  if(opcode[value] >= 0x50 && opcode[value] <= 0x68 && opcode[value] != 0x66)
+  if((opcode[value] >= 0x50 && opcode[value] <= 0x68 && opcode[value] != 0x66)
+  || opcode[value] == 0x0e)
   {
     // 68 opcode holds a special value for PUSH
     instreg.instruction = PUSH;
@@ -36,9 +37,8 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = MUL;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0x66 || opcode[value] == 0x89 || opcode[value] == 0xb0
-    || opcode[value] == 0xb3 || opcode[value] == 0xb4 || opcode[value] == 0xb8
-    || opcode[value] == 0xb9 || opcode[value] == 0xba || opcode[value] == 0xbb) {
+  else if(opcode[value] == 0x66 || opcode[value] == 0x89 || (opcode[value] >= 0xb0
+    && opcode[value] <= 0xbb)) {
     instreg.instruction = MOV;
     return instreg.instruction;
   }
@@ -72,6 +72,14 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JMP;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0xF4) {
+    instreg.instruction = HLT;
+    return instreg.instruction;
+  }
+  else if(opcode[value] == 0xFA) {
+    instreg.instruction = CLI;
+    return instreg.instruction;
+  }
   else {
     // opcode 90
     instreg.instruction = NOP;
@@ -84,8 +92,12 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
 {
   struct instrReg instreg;
 
-  if(opcode[value] == 0x42)
+  if(opcode[value] == 0x0e)
   {
+    instreg.registr = CS;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x42) {
     instreg.registr = EDX;
     return instreg.registr;
   }
@@ -147,12 +159,28 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = AL;
     return instreg.registr;
   }
+  else if(opcode[value] == 0xb1 && opcode[value+1] >= 0x00) {
+    instreg.registr = CL;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xb2 && opcode[value+1] >= 0x00) {
+    instreg.registr = DL;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0xb3 && opcode[value+1] >= 0x00) {
     instreg.registr = BL;
     return instreg.registr;
   }
   else if(opcode[value] == 0xb4 && opcode[value+1] >= 0x00) {
     instreg.registr = AH;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xb5 && opcode[value+1] >= 0x00) {
+    instreg.registr = CH;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xb6 && opcode[value+1] >= 0x00) {
+    instreg.registr = DH;
     return instreg.registr;
   }
   else if(opcode[value] == 0xb8 && opcode[value+1] >= 0x00) {
@@ -187,6 +215,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     return instreg.registr;
   }
   else if(opcode[value] == 0xe9 || opcode[value] == 0xea || opcode[value] == 0xeb) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0xf4 || opcode[value] == 0xfa) {
     instreg.registr = SPEC;
     return instreg.registr;
   }
@@ -250,6 +282,13 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
           fprintf(file, "\t%s\t\t%s, %s [var]\n", instr, storedStr.reg1, storedStr.reg2);
           i += 5;
         }
+      }
+      else if(bytes_read[i] == 0xbb && (bytes_read[i+1] >= 0x00 &&
+        bytes_read[i+1] <= 0x10)) {
+        printf("\t%s\t\t%s, 0x%x%x%x%x\n", instr, reg, (int)bytes_read[i+1],
+        (int)bytes_read[i+2], (int)bytes_read[i+3], (int)bytes_read[i+4]);
+        fprintf(file, "\t%s\t\t%s, 0x%x%x%x%x\n", instr, reg, (int)bytes_read[i+1],
+        (int)bytes_read[i+2], (int)bytes_read[i+3], (int)bytes_read[i+4]);
       }
       // just mov'ing a number into a register
       else {
