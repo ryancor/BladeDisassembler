@@ -72,6 +72,19 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JMP;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0xF3) {
+    if(opcode[value+1] == 0xAA)
+    {
+      instreg.instruction = STOSB;
+    }
+    else if(opcode[value+1] == 0xAB) {
+      instreg.instruction = STOSD;
+    }
+    else {
+      instreg.instruction = STOSW;
+    }
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0xF4) {
     instreg.instruction = HLT;
     return instreg.instruction;
@@ -218,6 +231,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = SPEC;
     return instreg.registr;
   }
+  else if(opcode[value] == 0xf3 && (opcode[value+1] == 0xaa || opcode[value+1] == 0xab)) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0xf4 || opcode[value] == 0xfa) {
     instreg.registr = SPEC;
     return instreg.registr;
@@ -347,6 +364,18 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
         printf("\t%s\t\t0x%x\n", instr, (int)bytes_read[i+1]);
         fprintf(file, "\t%s\t\t\t0x%x\n", instr, (int)bytes_read[i+1]);
         // jump further into the loop, i jumps four bytes
+        i += 1;
+      }
+      else if(strncmp("STOS", instr, 4) == 0) {
+        if(bytes_read[i+1] == 0xAB)
+        {
+          printf("\tREP %s\t\tDWORD PTR ES:[EDI], EAX\n", instr);
+          fprintf(file, "\tREP %s\t\t\tDWORD PTR ES:[EDI], EAX\n", instr);
+        }
+        else {
+          printf("\tREP %s\t\tBYTE PTR ES:[EDI], AL\n", instr);
+          fprintf(file, "\tREP %s\t\t\tBYTE PTR ES:[EDI], AL\n", instr);
+        }
         i += 1;
       }
       else {

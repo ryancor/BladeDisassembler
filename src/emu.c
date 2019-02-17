@@ -513,6 +513,32 @@ void debugger_loop()
       }
       break;
 
+      // OPERAND = REP STOS*
+      case 0xf3:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t edi = (instr >> 4) & 0x07;
+        uint16_t imm_flag = (instr >> 7) & 0x01;
+
+        // if STOSB
+        if((op+1) == 0xAB)
+        {
+          reg[imm_flag] = reg[eax] & 0xFF;
+          reg[edi] = (reg[edi] & 0xFFFF) + 4;
+          reg[eax] = reg[edi];
+        }
+        else {
+          reg[imm_flag] = reg[eax] & 0xFF;
+          reg[edi] = (reg[edi] & 0xFFFF) - 4;
+          reg[eax] = reg[edi];
+        }
+
+        update_eflags(eax);
+        print_current_registers("REP STOS*", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
       // OPERAND = SHL/SHR
       case 0xc0:
       case 0xc1:
