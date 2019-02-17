@@ -29,7 +29,7 @@ enum instructions {
   JMP, LAHF, LDS, LEA, LES, LOCK, LODSB, LODSW, LOOP, MOV, MOVSB, MOVSW, MUL,
   NEG, NOP, NOT, OR, OUT, POP, POPF, PUSH, PUSHF, RCL, RCR, RET, RETN, RETF,
   ROL, ROR, SAHF, SAL, SAR, SBB, SCASB, SCASW, SHL, SHR, STC, STD, STI, STOSB,
-  STOSW, SUB, TEST, WAIT, XCHG, XLAT, XOR
+  STOSD, STOSW, SUB, TEST, WAIT, XCHG, XLAT, XOR
 };
 
 static inline const char *stringFromInstruction(enum instructions i)
@@ -44,7 +44,8 @@ static inline const char *stringFromInstruction(enum instructions i)
     "LODSB", "LODSW", "LOOP", "MOV", "MOVSB", "MOVSW", "MUL", "NEG", "NOP", "NOT",
     "OR", "OUT", "POP", "POPF", "PUSH", "PUSHF", "RCL", "RCR", "RET", "RETN", "RETF",
     "ROL", "ROR", "SAHF", "SAL", "SAR", "SBB", "SCASB", "SCASW", "SHL", "SHR", "STC",
-    "STD", "STI", "STOSB", "STOSW", "SUB", "TEST", "WAIT", "XCHG", "XLAT", "XOR"
+    "STD", "STI", "STOSB", "STOSD", "STOSW", "SUB", "TEST", "WAIT", "XCHG", "XLAT",
+    "XOR"
   };
 
   return instr[i];
