@@ -152,7 +152,7 @@ void print_current_registers(char *instr_name, uint16_t eax, uint16_t ebx,
   printf("       SP => 0x%08x\n", esp & 0xFFFF);
   printf("EIP => 0x%08x\n\n\n", eip);
 
-  sleep(2);
+  sleep(1);
 }
 
 void debugger_loop()
@@ -164,6 +164,15 @@ void debugger_loop()
     // First loop: EIP would == 0x1001
     uint16_t instr = mem_read(reg[EIP]++);
     uint16_t op = instr >> 12;
+    if(instr != 0x00 && op == 0x00)
+    {
+      op = instr >> 6;
+      // if op still equals 0, don't shift the instruction pointer.
+      if(op == 0x00)
+      {
+        op = instr >> 0;
+      }
+    }
 
     //printf("\n**** OP: %02x\n", op);
     switch(op)
@@ -579,6 +588,33 @@ void debugger_loop()
 
         update_eflags(eax);
         print_current_registers("SHL/SHR", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
+        reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
+      }
+      break;
+
+      // OPERAND = XOR
+      case 0x30:
+      case 0x31:
+      case 0x32:
+      case 0x33:
+      case 0x34:
+      case 0x35:
+      {
+        uint16_t eax = (instr >> 9) & 0x07;
+        uint16_t imm_flag = (instr >> 8) & 0x01;
+
+        if(imm_flag)
+        {
+          uint16_t imm8 = sign_extend(instr & 0x1F, 8);
+          reg[eax] = reg[eax] ^ imm8;
+          if(reg[eax] < 0xFFF)
+          {
+            reg[eax] = eax;
+            reg[eax] = reg[eax] ^ imm8;
+          }
+        }
+        update_eflags(eax);
+        print_current_registers("XOR", reg[EAX], reg[EBX], reg[ECX], reg[EDX],
         reg[ESI], reg[EDI], reg[EBP], reg[ESP], reg[EIP]);
       }
       break;
