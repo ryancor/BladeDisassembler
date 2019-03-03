@@ -46,7 +46,11 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JB;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0x83) {
+  else if(opcode[value] == 0x83 && (opcode[value+1] >= 0xc0 && opcode[value+1] <= 0xc7)) {
+    instreg.instruction = ADD;
+    return instreg.instruction;
+  }
+  else if(opcode[value] == 0x83 && (opcode[value+1] >= 0xe8 && opcode[value+1] <= 0xef)) {
     instreg.instruction = SUB;
     return instreg.instruction;
   }
@@ -155,6 +159,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EAXEDX;
     return instreg.registr;
   }
+  else if(opcode[value] == 0x83 && opcode[value+1] == 0xc3) {
+    instreg.registr = EBX;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0x83 && opcode[value+1] == 0xec) {
     instreg.registr = ESP;
     return instreg.registr;
@@ -200,9 +208,8 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EAX;
     return instreg.registr;
   }
-  // value+1 will be the offset variable
-  else if(opcode[value] == 0xb9 && (opcode[value+2] == 0x91
-  && opcode[value+3] == 0x04 && opcode[value+4] == 0x08)) {
+  // value+1 will be the offset variable of ECX
+  else if(opcode[value] == 0xb9) {
     instreg.registr = ECXOFFSET;
     return instreg.registr;
   }
@@ -261,7 +268,13 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
     fprintf(file, "0x00000%x:", start_address);
     printf("0x00000%x:", start_address);
 
-    if(strncmp("CMP", instr, strlen(instr)) == 0)
+    if(strncmp("ADD", instr, strlen(instr)) == 0)
+    {
+      // bytes_read[i + 1] will be the register value
+      printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+      fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+    }
+    else if(strncmp("CMP", instr, strlen(instr)) == 0)
     {
       storedStr = splitStrStart(reg, " ");
       printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
@@ -291,14 +304,21 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
       }
       else if(bytes_read[i] == 0xb9) {
         // i+1 will be the offset variable
+        storedStr = splitStrStart(reg, " ");
         if(bytes_read[i+2] == 0x91 && bytes_read[i+3] == 0x04
         && bytes_read[i+4] == 0x08)
         {
-          storedStr = splitStrStart(reg, " ");
           printf("\t%s\t\t%s, %s [var]\n", instr, storedStr.reg1, storedStr.reg2);
           fprintf(file, "\t%s\t\t%s, %s [var]\n", instr, storedStr.reg1, storedStr.reg2);
-          i += 5;
         }
+        // i+1 will be the bytes being moved into ecx
+        else {
+          printf("\t%s\t\t%s, 0x%x%x%x%x\n", instr, storedStr.reg1, (int)bytes_read[i+1],
+            (int)bytes_read[i+2], (int)bytes_read[i+3], (int)bytes_read[i+4]);
+          fprintf(file, "\t%s\t\t%s, 0x%x%x%x%x\n", instr, storedStr.reg1, (int)bytes_read[i+1],
+            (int)bytes_read[i+2], (int)bytes_read[i+3], (int)bytes_read[i+4]);
+        }
+        i += 5;
       }
       else if(bytes_read[i] == 0xbb && (bytes_read[i+1] >= 0x00 &&
         bytes_read[i+1] <= 0x10)) {
