@@ -37,7 +37,7 @@ unsigned int checkFileType(unsigned char *bytes_read)
   if(header == ELF_HEADER)
   {
     printf("[+] ELF Magic Header Found: 0x%x\n", header);
-    code_address += 0x110;
+    code_address += 0x80;
   }
   else if(header == PE_HEADER) {
     printf("[+] PE Magic Header Found: 0x%x\n", header);
