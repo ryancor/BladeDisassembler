@@ -33,6 +33,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = CMP;
     return instreg.instruction;
   }
+  else if(opcode[value] >= 0x48 && opcode[value] <= 0x4f) {
+    instreg.instruction = DEC;
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0xf6 || opcode[value] == 0xf7) {
     instreg.instruction = MUL;
     return instreg.instruction;
@@ -159,12 +163,21 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EAXEDX;
     return instreg.registr;
   }
-  else if(opcode[value] == 0x83 && opcode[value+1] == 0xc3) {
-    instreg.registr = EBX;
+  else if(opcode[value] >= 0x48 && opcode[value] <= 0x4f) {
+    instreg.registr = opcode[value] - 0x48;
     return instreg.registr;
   }
-  else if(opcode[value] == 0x83 && opcode[value+1] == 0xec) {
-    instreg.registr = ESP;
+  else if(opcode[value] == 0x83) {
+    if(opcode[value+1] == 0xc1)
+    {
+      instreg.registr = ECX;
+    }
+    else if(opcode[value+1] == 0xc3) {
+      instreg.registr = EBX;
+    }
+    else if(opcode[value+1] == 0xec) {
+      instreg.registr = ESP;
+    }
     return instreg.registr;
   }
   else if(opcode[value] == 0x8D && opcode[value+1] == 0x44
