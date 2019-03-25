@@ -50,7 +50,8 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JB;
     return instreg.instruction;
   }
-  else if(opcode[value] == 0x83 && (opcode[value+1] >= 0xc0 && opcode[value+1] <= 0xc7)) {
+  else if(opcode[value] == 0x03 || (opcode[value] == 0x83 &&
+    (opcode[value+1] >= 0xc0 && opcode[value+1] <= 0xc7))) {
     instreg.instruction = ADD;
     return instreg.instruction;
   }
@@ -113,8 +114,23 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
 {
   struct instrReg instreg;
 
-  if(opcode[value] == 0x0e)
+  if(opcode[value] == 0x03)
   {
+    if(opcode[value+1] >= 0x18 && opcode[value+1] <= 0x1e)
+    {
+      // EBX+IMM32 starts at enum 34
+      // 34 - 24 = 10, so increment by 10.
+      instreg.registr = opcode[value+1] + 0xA;
+    }
+    else if(opcode[value+1] == 0x5d) {
+      instreg.registr = EBXEBP;
+    }
+    else {
+      instreg.registr = EIP;
+    }
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x0e) {
     instreg.registr = CS;
     return instreg.registr;
   }
@@ -283,9 +299,18 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
 
     if(strncmp("ADD", instr, strlen(instr)) == 0)
     {
-      // bytes_read[i + 1] will be the register value
-      printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
-      fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+      if(bytes_read[i] == 0x03)
+      {
+        storedStr = splitStrStart(reg, " ");
+        // bytes_read[i + 1] will be the register value
+        printf("\t%s\t\t%s, [%s]\n", instr, storedStr.reg1, storedStr.reg2);
+        fprintf(file, "\t%s\t\t%s, [%s]\n", instr, storedStr.reg1, storedStr.reg2);
+      }
+      else {
+        // bytes_read[i + 1] will be the register value
+        printf("\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+        fprintf(file, "\t%s\t\t%s, 0x%x\n", instr, reg, (int)bytes_read[i+2]);
+      }
     }
     else if(strncmp("CMP", instr, strlen(instr)) == 0)
     {
