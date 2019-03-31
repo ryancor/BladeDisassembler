@@ -43,7 +43,18 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
   }
   else if(opcode[value] == 0x66 || opcode[value] == 0x89 || (opcode[value] >= 0xb0
     && opcode[value] <= 0xbb)) {
-    instreg.instruction = MOV;
+    // 0x66 0x98 == CBW
+    if(opcode[value+1] == 0x98)
+    {
+      instreg.instruction = CBW;
+    }
+    // 0x66 0x99 == CWD
+    else if(opcode[value+1] == 0x99) {
+      instreg.instruction = CWD;
+    }
+    else {
+      instreg.instruction = MOV;
+    }
     return instreg.instruction;
   }
   else if(opcode[value] == 0x72) {
@@ -65,6 +76,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
   }
   else if(opcode[value] == 0x8D) {
     instreg.instruction = LEA;
+    return instreg.instruction;
+  }
+  else if(opcode[value] == 0x99) {
+    instreg.instruction = CDQ;
     return instreg.instruction;
   }
   else if(opcode[value] == 0xc0 || opcode[value] == 0xc1) {
@@ -199,6 +214,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
   else if(opcode[value] == 0x8D && opcode[value+1] == 0x44
   && opcode[value+2] == 0x24) {
     instreg.registr = EAXESP;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x99) {
+    instreg.registr = SPEC;
     return instreg.registr;
   }
   else if(opcode[value] == 0xf7 && opcode[value+1] == 0xe1) {
