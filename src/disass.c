@@ -216,6 +216,11 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EAXESP;
     return instreg.registr;
   }
+  else if(opcode[value] == 0x66 && (opcode[value+1] >= 0x98
+    && opcode[value+1] <= 0x99)) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0x99) {
     instreg.registr = SPEC;
     return instreg.registr;
@@ -271,7 +276,13 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     return instreg.registr;
   }
   else if(opcode[value] == 0x66 && opcode[value+1] >= 0xba) {
-    instreg.registr = DX;
+    if(opcode[value+1] == 0xbe)
+    {
+      instreg.registr = SI;
+    }
+    else {
+      instreg.registr = DX;
+    }
     return instreg.registr;
   }
   else if(opcode[value] == 0x89 && opcode[value+1] == 0xe3) {
@@ -298,6 +309,7 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EIP;
     return instreg.registr;
   }
+  return EIP;
 }
 
 void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_read,
