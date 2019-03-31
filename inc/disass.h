@@ -22,8 +22,8 @@ struct storeSplitStr {
 };
 
 enum instructions {
-  AAA, AAD, AAM, AAS, ADC, ADD, AND, CALL, CBW, CLC, CLD, CLI, CMC, CMP, CMPSB,
-  CMPSW, CWD, DAA, DAS, DEC, DIV, ESC, HLT, IDIV, IMUL, IN, INC, INT, INTO,
+  AAA, AAD, AAM, AAS, ADC, ADD, AND, CALL, CBW, CDQ, CLC, CLD, CLI, CMC, CMP,
+  CMPSB, CMPSW, CWD, DAA, DAS, DEC, DIV, ESC, HLT, IDIV, IMUL, IN, INC, INT, INTO,
   IRET, JA, JAE, JB, JBE, JC, JE, JG, JGE, JL, JLE, JNA, JNAE, JNB, JNBE, JNC,
   JNE, JNG, JNGE, JNL, JNLE, JNO, JNP, JNS, JNZ, JO, JP, JPE, JPO, JS, JZ, JCXZ,
   JMP, LAHF, LDS, LEA, LES, LOCK, LODSB, LODSW, LOOP, MOV, MOVSB, MOVSW, MUL,
@@ -35,17 +35,17 @@ enum instructions {
 static inline const char *stringFromInstruction(enum instructions i)
 {
   static const char *instr[] = {
-    "AAA", "AAD", "AAM", "AAS", "ADC", "ADD", "AND", "CALL", "CBW", "CLC", "CLD",
-    "CLI", "CMC", "CMP", "CMPSB", "CMPSW", "CWD", "DAA", "DAS", "DEC", "DIV", "ESC",
-    "HLT", "IDIV", "IMUL", "IN", "INC", "INT", "INTO", "IRET", "JA", "JAE", "JB",
-    "JBE", "JC", "JE", "JG", "JGE", "JL", "JLE", "JNA", "JNAE", "JNB", "JNBE", "JNC",
-    "JNE", "JNG", "JNGE", "JNL", "JNLE", "JNO", "JNP", "JNS", "JNZ", "JO", "JP",
-    "JPE", "JPO", "JS", "JZ", "JCXZ", "JMP", "LAHF", "LDS", "LEA", "LES", "LOCK",
-    "LODSB", "LODSW", "LOOP", "MOV", "MOVSB", "MOVSW", "MUL", "NEG", "NOP", "NOT",
-    "OR", "OUT", "POP", "POPF", "PUSH", "PUSHF", "RCL", "RCR", "RET", "RETN", "RETF",
-    "ROL", "ROR", "SAHF", "SAL", "SAR", "SBB", "SCASB", "SCASW", "SHL", "SHR", "STC",
-    "STD", "STI", "STOSB", "STOSD", "STOSW", "SUB", "TEST", "WAIT", "XCHG", "XLAT",
-    "XOR"
+    "AAA", "AAD", "AAM", "AAS", "ADC", "ADD", "AND", "CALL", "CBW", "CDQ", "CLC",
+    "CLD", "CLI", "CMC", "CMP", "CMPSB", "CMPSW", "CWD", "DAA", "DAS", "DEC", "DIV",
+    "ESC", "HLT", "IDIV", "IMUL", "IN", "INC", "INT", "INTO", "IRET", "JA", "JAE",
+    "JB", "JBE", "JC", "JE", "JG", "JGE", "JL", "JLE", "JNA", "JNAE", "JNB", "JNBE",
+    "JNC", "JNE", "JNG", "JNGE", "JNL", "JNLE", "JNO", "JNP", "JNS", "JNZ", "JO",
+    "JP", "JPE", "JPO", "JS", "JZ", "JCXZ", "JMP", "LAHF", "LDS", "LEA", "LES",
+    "LOCK", "LODSB", "LODSW", "LOOP", "MOV", "MOVSB", "MOVSW", "MUL", "NEG", "NOP",
+    "NOT", "OR", "OUT", "POP", "POPF", "PUSH", "PUSHF", "RCL", "RCR", "RET", "RETN",
+    "RETF", "ROL", "ROR", "SAHF", "SAL", "SAR", "SBB", "SCASB", "SCASW", "SHL", "SHR",
+    "STC", "STD", "STI", "STOSB", "STOSD", "STOSW", "SUB", "TEST", "WAIT", "XCHG",
+    "XLAT", "XOR"
   };
 
   return instr[i];
