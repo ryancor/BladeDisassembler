@@ -61,6 +61,10 @@ int ReturnInstructionNumber(unsigned char* opcode, int value)
     instreg.instruction = JB;
     return instreg.instruction;
   }
+  else if(opcode[value] == 0x75) {
+    instreg.instruction = JNZ;
+    return instreg.instruction;
+  }
   else if(opcode[value] == 0x03 || (opcode[value] == 0x83 &&
     (opcode[value+1] >= 0xc0 && opcode[value+1] <= 0xc7))) {
     instreg.instruction = ADD;
@@ -162,6 +166,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     return instreg.registr;
   }
   else if(opcode[value] == 0x72 && opcode[value+1] == 0x32) {
+    instreg.registr = SPEC;
+    return instreg.registr;
+  }
+  else if(opcode[value] == 0x75) {
     instreg.registr = SPEC;
     return instreg.registr;
   }
@@ -289,6 +297,10 @@ int ReturnRegisterNumber(unsigned char* opcode, int value)
     instreg.registr = EBXESP;
     return instreg.registr;
   }
+  else if(opcode[value] == 0x89 && opcode[value+1] == 0x1d) {
+    instreg.registr = EBX;
+    return instreg.registr;
+  }
   else if(opcode[value] == 0xc1 && opcode[value+1] == 0xe8) {
     instreg.registr = EAX;
     return instreg.registr;
@@ -370,6 +382,14 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
           printf("\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
           fprintf(file, "\t%s\t\t%s, %s\n", instr, storedStr.reg1, storedStr.reg2);
         }
+        else if(bytes_read[i+1] == 0x1d) {
+          printf("\t%s\t\tdword ptr 0x%x%x%x%x, %s\n", instr,
+            bytes_read[i+2], bytes_read[i+3], bytes_read[i+4], bytes_read[i+5],
+            reg);
+          fprintf(file, "\t%s\t\tdword ptr 0x%x%x%x%x, %s\n", instr,
+            bytes_read[i+2], bytes_read[i+3], bytes_read[i+4], bytes_read[i+5],
+            reg);
+        }
       }
       else if(bytes_read[i] == 0xb9) {
         // i+1 will be the offset variable
@@ -440,7 +460,8 @@ void printAssemblyCode(const char* instr, const char* reg, unsigned char* bytes_
         }
         i += bytes_read[i+1];
       }
-      else if(strncmp("JMP", instr, strlen(instr)) == 0) {
+      else if(strncmp("JMP", instr, strlen(instr)) == 0 ||
+      strncmp("JNZ", instr, strlen(instr)) == 0) {
         if(bytes_read[i+1] >= 0x01)
         {
           printf("\t%s\t\t0x%x%x\n", instr, bytes_read[i+1], bytes_read[i+2]);
